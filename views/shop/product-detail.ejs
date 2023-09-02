@@ -11,6 +11,8 @@
             </div>
             <h3><%= product.price %></h3>
             <h3><%= product.description %></h3>
-            <%- include('../includes/add-to-cart') %>
+            <% if (isLoggedIn) { %>
+                <%- include('../includes/add-to-cart') %>
+            <% } %>
         </main>
 <%- include('../includes/end') %>

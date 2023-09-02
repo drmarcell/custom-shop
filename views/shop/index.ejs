@@ -26,7 +26,10 @@
                                     </p>
                                 </div>
                                 <div class="card__actions">
-                                    <%- include('../includes/add-to-cart') %>
+                                    <a href="/products/<%= product._id %>" class="btn">Details</a>
+                                    <% if (isLoggedIn) { %>
+                                        <%- include('../includes/add-to-cart') %>
+                                    <% } %>
                                 </div>
                             </article>
                             <% } %>
