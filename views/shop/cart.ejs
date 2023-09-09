@@ -9,10 +9,11 @@
                 <ul class="cart__item-list">
                     <% products.forEach(cartProduct => { %>
                         <li class="cart__item">
-                            <h1><%= cartProduct.title %></h1>
-                            <h2>Quantity: <%= cartProduct.cartItem.quantity %></h2>
+                            <h1><%= cartProduct.productId.title %></h1>
+                            <h2>Quantity: <%= cartProduct.quantity %></h2>
                             <form action="/cart-delete-item" method="post">
-                                <input type="hidden" name="productId" value="<%= cartProduct.id %>">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <input type="hidden" name="productId" value="<%= cartProduct.productId._id %>">
                                 <button type="submit" class="btn danger">Delete</button>
                             </form>
                         </li>
@@ -20,9 +21,11 @@
                 </ul>
                 <hr />
                 <div class="centered">
-                    <form action="/create-order" method="POST">
+                    <!-- <form action="/create-order" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <button type="submit" class="btn">Order now</button>
-                    </form>
+                    </form> -->
+                    <a class="btn" href="/checkout">Order Now!</a>
                 </div>
             <% } else { %>
                 <h1>No Products in Cart!</h1>
