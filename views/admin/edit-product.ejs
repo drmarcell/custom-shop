@@ -10,7 +10,7 @@
             <% if (errorMessage) { %>
                 <div class="user-message user-message--error"><%= errorMessage %></div>
             <% } %>
-            <form class="product-form" action="/admin/<%= isEditing ? 'edit-product' : 'add-product' %>" method="POST">
+            <form class="product-form" action="/admin/<%= isEditing ? 'edit-product' : 'add-product' %>" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="form-control">
                     <label for="title">Title</label>
@@ -22,7 +22,7 @@
                         class="<%= validationErrors.find(err => err.path === 'title') && 'invalid' %>"
                     >
                 </div>
-                <div class="form-control">
+                <!-- <div class="form-control">
                     <label for="imageUrl">Image URL</label>
                     <input
                         type="text"
@@ -30,6 +30,14 @@
                         id="imageUrl"
                         value="<%= (isEditing || hasError) ? product.imageUrl : '' %>"
                         class="<%= validationErrors.find(err => err.path === 'imageUrl') && 'invalid' %>"
+                    >
+                </div> -->
+                <div class="form-control">
+                    <label for="image">Image</label>
+                    <input
+                        type="file"
+                        name="image"
+                        id="image"
                     >
                 </div>
                 <div class="form-control">

@@ -95,7 +95,9 @@ const postLogin = (req, res, next) => {
                 })
         })
         .catch(err => {
-            console.log('cannot get user: ', err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
         });
 };
 
@@ -148,14 +150,18 @@ const postSignup = (req, res, next) => {
         })
         .then(result => {
             res.redirect('/login');
-            return transporter.sendMail({
-                to: email,
-                from: process.env.HOST_EMAIL,
-                subject: 'Signup completed',
-                html: '<h1>You successfully signed up!</h1>'
-            });
+            // return transporter.sendMail({
+            //     to: email,
+            //     from: process.env.HOST_EMAIL,
+            //     subject: 'Signup completed',
+            //     html: '<h1>You successfully signed up!</h1>'
+            // });
         })
-        .catch(err => console.log('error when trying to sign up: ', err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 const postLogout = (req, res, next) => {
@@ -240,7 +246,9 @@ const getNewPassword = (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log('cannot render reset password page: ', err);
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     })
 
 }
@@ -268,7 +276,9 @@ const postNewPassword = (req, res, next) => {
         res.redirect('/login');
     })
     .catch(err => {
-        console.log('cannot post password: ', err);
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     })
 };
 

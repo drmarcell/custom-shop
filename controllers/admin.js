@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const { validationResult } = require('express-validator');
+const fileHelper = require('../utils/file');
 
 const getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
@@ -13,7 +14,24 @@ const getAddProduct = (req, res, next) => {
 };
 
 const postAddProduct = (req, res, next) => {
-    const { title, price, imageUrl, description } = req.body;
+    console.log('POSTADDPRODUCT CALLED');
+    const { title, price, description } = req.body;
+    const image = req.file;
+    if (!image) {
+        return res.status(422).render('admin/edit-product', {
+            pageTitle: 'Add Product',
+            path: '/admin/edit-product',
+            isEditing: false,
+            hasError: true,
+            product: {
+                title,
+                price,
+                description
+            },
+            errorMessage: 'Attached file is not an image.',
+            validationErrors: []
+        });
+    }
     const errors = validationResult(req);
     console.log('errors are: ', errors);
     if (!errors.isEmpty()) {
@@ -25,13 +43,15 @@ const postAddProduct = (req, res, next) => {
             product: {
                 title,
                 price,
-                imageUrl,
                 description
             },
             errorMessage: errors.array()[0].msg,
             validationErrors: errors.array()
         });
     }
+
+    const imageUrl = image.path;
+
     const product = new Product({
         title,
         price,
@@ -104,7 +124,11 @@ const getEditProduct = (req, res, next) => {
                 errorMessage: null,
                 validationErrors: []
             })
-        }).catch(err => console.log('cannot get product by id: ', err));
+        }).catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
     // sequelize magic associated function
     // req.user
     //     .getProducts({
@@ -139,7 +163,8 @@ const getEditProduct = (req, res, next) => {
 };
 
 const postEditProduct = (req, res, next) => {
-    const { productId, title, price, imageUrl, description } = req.body;
+    const { productId, title, price, description } = req.body;
+    const image = req.file;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -152,7 +177,6 @@ const postEditProduct = (req, res, next) => {
                 _id: productId,
                 title,
                 price,
-                imageUrl,
                 description
             },
             errorMessage: errors.array()[0].msg,
@@ -162,21 +186,26 @@ const postEditProduct = (req, res, next) => {
 
     Product.findById(productId)
         .then(product => {
-            console.log('req.user._id: ', String(req.user._id));
-            console.log('product.userId: ', String(product.userId));
             if (String(product.userId) !== String(req.user._id)) {
                 return res.redirect('/');
             }
             product.title = title;
             product.price = price;
-            product.imageUrl = imageUrl;
+            if (image) {
+                fileHelper.deleteFile(image.imageUrl);
+                product.imageUrl = image.path;
+            }
             product.description = description;
             return product.save()
                 .then(result => {
                     res.redirect('/admin/products');
                 });
         })
-        .catch(err => console.log('cannot modify the product data: ', err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
     // Product.update({
     //     title,
     //     price,
@@ -213,7 +242,9 @@ const getProducts = (req, res, next) => {
             });
         })
         .catch(err => {
-            console.log('cannot fetch admin products: ', err);
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
         })
 
     // // sequelize magic associate mehotd
@@ -240,17 +271,28 @@ const getProducts = (req, res, next) => {
     // });
 };
 
-const postDeleteProduct = (req, res, next) => {
-    const { productId } = req.body;
-    Product.deleteOne({
-        _id: productId,
-        userId: req.user._id
-    })
+const deleteProduct = (req, res, next) => {
+    const { productId } = req.params;
+    Product.findById(productId)
+        .then(product => {
+            if (!product) {
+                return next(new Error('Product not found.'));
+            }
+            fileHelper.deleteFile(product.imageUrl);
+            return Product.deleteOne({
+                _id: productId,
+                userId: req.user._id
+            });
+        })
         .then(() => {
-            res.redirect('/admin/products');
+            res.status(200).json({
+                message: 'Success!'
+            });
         })
         .catch(err => {
-            console.log('cannot delete product: ', err);
+            res.status(500).json({
+                message: 'Deleting product failed.'
+            });
         });
     // Product.destroy({
     //     where: {
@@ -272,5 +314,5 @@ module.exports = {
     getEditProduct,
     postEditProduct,
     getProducts,
-    postDeleteProduct
+    deleteProduct
 }
