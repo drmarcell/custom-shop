@@ -370,6 +370,7 @@ const getCheckout = (req, res, next) => {
                 total += p.quantity * p.productId.price;
             });
 
+            // docs: https://stripe.com/docs/payments/checkout/custom-success-page#create-success-page
             return stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 line_items: products.map(p => {
@@ -386,7 +387,7 @@ const getCheckout = (req, res, next) => {
                     }
                 }),
                 mode: 'payment',
-                success_url: req.protocol + '://' + req.get('host') + '/checkout/success',
+                success_url: req.protocol + '://' + req.get('host') + '/checkout/success?session_id={CHECKOUT_SESSION_ID}',
                 cancel_url: req.protocol + '://' + req.get('host') + '/checkout/cancel',
               });
         })
