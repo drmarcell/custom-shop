@@ -6,11 +6,13 @@
         <main class="centered">
             <h2><%= product.title %></h2>
             <hr />
-            <div>
-                <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
+            <div class="image">
+                <img src="/<%= product.imageUrl %>" alt="<%= product.title %>">
             </div>
             <h3><%= product.price %></h3>
             <h3><%= product.description %></h3>
-            <%- include('../includes/add-to-cart') %>
+            <% if (isLoggedIn) { %>
+                <%- include('../includes/add-to-cart') %>
+            <% } %>
         </main>
 <%- include('../includes/end') %>

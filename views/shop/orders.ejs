@@ -1,9 +1,25 @@
 <%- include('../includes/head') %>
+    <link rel="stylesheet" href="/css/orders.css">
     </head>
 
     <body>
         <%- include('../includes/navigation') %>
         <main>
-            <h3>This is the orders page!</h3>
+            <% if (orders.length <= 0) { %>
+                <h3>Nothing there!</h3>
+            <% } else { %>
+                <ul class="orders">
+                    <% orders.forEach(order => { %>
+                        <li class="orders__item">
+                            <h1>Order - # <%= order.id %> - <a href="/orders/<%= order._id %>">Invoice</a></h1>
+                            <ul class="orders__products">
+                                <% order.products.forEach(pItem => { %>
+                                    <li class="orders__products-item"><%= pItem.product.title %> (<%= pItem.quantity %>)</li>
+                                <% }) %>
+                            </ul>
+                        </li>
+                    <% }) %>
+                </ul>
+            <% } %>
         </main>
 <%- include('../includes/end') %>
