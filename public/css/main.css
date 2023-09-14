@@ -78,6 +78,14 @@ form {
   color: #ffeb3b;
 }
 
+.burger-menu {
+  left: 0;
+  top: 0;
+  height: 50px;
+  width: 50px;
+  background-color: black;
+}
+
 .mobile-nav {
   width: 30rem;
   height: 100vh;
