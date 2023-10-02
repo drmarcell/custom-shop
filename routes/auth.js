@@ -9,7 +9,7 @@ router.get('/login', getLogin);
 router.post(
     '/login',
     [
-        body('email', 'Please provide a valid email address').isEmail().normalizeEmail(),
+        body('email', 'Please provide a valid email address').isEmail(), // .normalizeEmail(),
         body('password', 'Please enter a password with only numbers and text and at least 5 characters')
             .isLength({
                 min: 5
@@ -38,8 +38,8 @@ router.post(
                             return Promise.reject('Email already exists, please pick a different one')
                         }
                     });
-            })
-            .normalizeEmail(),
+            }),
+            // .normalizeEmail(),
         body(
             'password',
             'Please enter a password with only numbers and text and at least 5 characters'
